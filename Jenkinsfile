@@ -1,7 +1,7 @@
 pipeline {
     agent {
-        docker { 
-            image 'docker:latest' 
+        docker {
+            image 'amazonlinux:2'  // Use Amazon Linux 2 which includes AWS CLI
             args '--privileged -v /var/run/docker.sock:/var/run/docker.sock' 
         }
     }
@@ -22,6 +22,8 @@ pipeline {
             steps {
                 echo 'Logging in to AWS ECR...'
                 sh """
+                # Install AWS CLI on Amazon Linux container
+                yum install -y aws-cli
                 aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${REPO_NAME}
                 """
             }
