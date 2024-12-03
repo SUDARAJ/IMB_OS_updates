@@ -19,8 +19,10 @@ pipeline {
                 # Update package manager and install dependencies
                 yum update -y > /dev/null 2>&1
                 yum install -y sudo aws-cli docker git > /dev/null 2>&1
-                # Start Docker service
-                sudo systemctl start docker
+                # Start Docker daemon
+                echo "Starting Docker daemon..."
+                dockerd &
+
                 echo "Verifying Docker installation..."
                 docker --version
                 '''
