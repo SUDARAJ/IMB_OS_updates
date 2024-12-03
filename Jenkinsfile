@@ -17,8 +17,8 @@ pipeline {
             steps {
                 sh '''
                 # Update package manager and install dependencies
-                yum update -y
-                yum install -y sudo aws-cli docker git
+                yum update -y > /dev/null 2>&1
+                yum install -y sudo aws-cli docker git > /dev/null 2>&1
                 '''
             }
         }
