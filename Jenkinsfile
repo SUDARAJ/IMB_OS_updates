@@ -31,9 +31,22 @@ pipeline {
         stage('Login to AWS ECR') {
             steps {
                 echo 'Logging in to AWS ECR...'
-                withAWS(region: "${AWS_REGION}") {
+                withCredentials([
+                    aws(credentialsId: 'aws-ecr-credentials', 
+                        accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
+                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
                     sh """
+                    # Configure AWS CLI
+                    aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+                    aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+                    aws configure set region ${AWS_REGION}
+                    
+                    # Login to ECR
                     aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${REPO_NAME}
+                    
+                    # Verify ECR repository exists
+                    aws ecr describe-repositories --repository-names support-automations
                     """
                 }
             }
