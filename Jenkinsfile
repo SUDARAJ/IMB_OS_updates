@@ -23,7 +23,7 @@ pipeline {
                 echo 'Logging in to AWS ECR...'
                 sh """
                 # Install AWS CLI on Amazon Linux container
-                yum install -y aws-cli
+                sudo yum install -y aws-cli
                 aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${REPO_NAME}
                 """
             }
