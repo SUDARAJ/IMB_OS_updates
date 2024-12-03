@@ -6,10 +6,10 @@ pipeline {
         }
     }
     environment {
-        REPO_NAME = "your-aws-account-id.dkr.ecr.your-region.amazonaws.com/your-repo-name"
-        AWS_REGION = "your-region"
-        DOCKER_IMAGE_TAG = "${env.BUILD_NUMBER}" // Or use 'latest'
-        GIT_REPO_URL = "https://github.com/your-username/your-repo.git"
+        REPO_NAME = "864923301006.dkr.ecr.ap-southeast-2.amazonaws.com/support-automations"
+        AWS_REGION = "ap-southeast-2"
+        DOCKER_IMAGE_TAG = "${env.BUILD_NUMBER}" // Build number used as the image tag
+        GIT_REPO_URL = "https://github.com/SUDARAJ/IMB_OS_updates.git"
     }
     stages {
         stage('Clone Repository') {
@@ -28,20 +28,20 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                echo 'Building Docker image...'
+                echo "Building Docker image with tag: ${DOCKER_IMAGE_TAG}..."
                 sh "docker build -t ${REPO_NAME}:${DOCKER_IMAGE_TAG} ."
             }
         }
         stage('Push Docker Image to ECR') {
             steps {
-                echo 'Pushing Docker image to AWS ECR...'
+                echo "Pushing Docker image to ECR with tag: ${DOCKER_IMAGE_TAG}..."
                 sh "docker push ${REPO_NAME}:${DOCKER_IMAGE_TAG}"
             }
         }
     }
     post {
         always {
-            echo 'Pipeline execution completed!'
+            echo "Pipeline execution completed! Docker image tagged with: ${DOCKER_IMAGE_TAG}"
         }
     }
 }
