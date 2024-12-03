@@ -1,17 +1,27 @@
 pipeline {
     agent {
         docker {
-            image 'amazonlinux:2'  // Use Amazon Linux 2 which includes AWS CLI
-            args '--privileged -v /var/run/docker.sock:/var/run/docker.sock' 
+            image 'amazonlinux:2'  
+            // Remove the --privileged flag and use root user
+            args '-u root -v /var/run/docker.sock:/var/run/docker.sock' 
         }
     }
     environment {
         REPO_NAME = "864923301006.dkr.ecr.ap-southeast-2.amazonaws.com/support-automations"
         AWS_REGION = "ap-southeast-2"
-        DOCKER_IMAGE_TAG = "${env.BUILD_NUMBER}" // Build number used as the image tag
+        DOCKER_IMAGE_TAG = "${env.BUILD_NUMBER}"
         GIT_REPO_URL = "https://github.com/SUDARAJ/IMB_OS_updates.git"
     }
     stages {
+        stage('Prepare Environment') {
+            steps {
+                sh '''
+                # Update package manager and install dependencies
+                yum update -y
+                yum install -y sudo aws-cli docker git
+                '''
+            }
+        }
         stage('Clone Repository') {
             steps {
                 echo 'Cloning GitHub repository...'
@@ -21,12 +31,11 @@ pipeline {
         stage('Login to AWS ECR') {
             steps {
                 echo 'Logging in to AWS ECR...'
-                sh """
-                # Install AWS CLI on Amazon Linux container
-                yum install -y sudo
-                sudo yum install -y aws-cli
-                aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${REPO_NAME}
-                """
+                withAWS(region: "${AWS_REGION}") {
+                    sh """
+                    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${REPO_NAME}
+                    """
+                }
             }
         }
         stage('Build Docker Image') {
