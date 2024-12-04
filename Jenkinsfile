@@ -35,7 +35,7 @@ pipeline {
                 git branch: 'main', url: "${env.GIT_REPO_URL}"
             }
         }
-	    
+        
         stage('Configure AWS CLI') {
             steps {
                 echo 'Configuring AWS CLI...'
@@ -48,7 +48,7 @@ pipeline {
                     """
                 }
             }
-        }	
+        }    
 
         stage('Install kubectl') {
             steps {
@@ -67,8 +67,8 @@ pipeline {
                 kubectl version --client
                 """
             }
-        }		    
-	    
+        }            
+        
         stage('Login to AWS ECR') {
             steps {
                 echo 'Logging in to AWS ECR...'
@@ -80,7 +80,7 @@ pipeline {
                 aws ecr describe-repositories --repository-names support-automations
                 """
             }
-        }	
+        }    
 
         stage('Build Docker Image') {
             steps {
