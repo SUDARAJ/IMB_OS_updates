@@ -51,7 +51,7 @@ pipeline {
 		}	
 
 	stage('Install kubectl') {
-				steps {
+			steps {
 					echo 'Installing kubectl...'
 					sh """
 					# Download the latest stable version of kubectl
@@ -67,7 +67,7 @@ pipeline {
 					kubectl version --client
 					"""
 				}
-			}	    
+			}		    
 	    
 	stage('Login to AWS ECR') {
 			steps {
