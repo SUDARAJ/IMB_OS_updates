@@ -61,43 +61,44 @@ pipeline {
         }
 
 	stage('Install kubectl') {
-    		steps {
-        		sh '''
-        		# Install kubectl
-        		echo "Installing kubectl..."
-        		curl -LO "https://dl.k8s.io/release/v1.27.4/bin/linux/amd64/kubectl"
-        		chmod +x ./kubectl
-        		mv ./kubectl /usr/local/bin/kubectl
-        
-        		# Verify kubectl installation
-        		kubectl version --client
-        		'''
-    			}
-		}
+	    steps {
+	        sh '''
+	        # Install kubectl
+	        echo "Installing kubectl..."
+	        
+	        # Get the latest version of kubectl
+	        KUBECTL_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
+	        
+	        # Download the latest kubectl
+	        curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+	        
+	        # Make the kubectl binary executable
+	        chmod +x ./kubectl
+	        
+	        # Move kubectl to /usr/local/bin
+	        mv ./kubectl /usr/local/bin/kubectl
+	        
+	        # Verify kubectl installation
+	        kubectl version --client
+	        '''
+	    }
+	}
 
-   	stage('Install kubectl') {
+   	stage('Connect to EKS Cluster') {
     		steps {
         		sh '''
-        		# Install kubectl
-        		echo "Installing kubectl..."
+        		# Remove any existing kubeconfig to prevent errors
+       			 rm -f ~/.kube/config
         
-		        # Get the latest version of kubectl
-		        KUBECTL_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
-		        
-		        # Download the latest kubectl
-		        curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
-		        
-		        # Make the kubectl binary executable
-		        chmod +x ./kubectl
-		        
-		        # Move kubectl to /usr/local/bin
-		        mv ./kubectl /usr/local/bin/kubectl
-		        
-		        # Verify kubectl installation
-		        kubectl version --client
-		        '''
-		    }
-		}
+        		# Configure kubectl to use the EKS cluster
+        		echo "Connecting to EKS cluster..."
+        		aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks --kubeconfig ~/.kube/config --api-version client.authentication.k8s.io/v1beta1
+        
+        		# Verify kubectl connection
+        		kubectl get nodes
+        		'''
+    		}
+	}
 	
         stage('Build Docker Image') {
             steps {
