@@ -3,58 +3,35 @@ pipeline {
         docker {
             image 'amazonlinux:2'
             label 'docker'
-            args '-v /tmp:/tmp'  // Optional, map a local volume to the container
+            // Remove unnecessary volume mapping
         }
     }
-
     environment {
-        // Ensure root user is used for all steps
         DOCKER_USER = 'root'
     }
-
     stages {
-        stage('Switch to root') {
-            steps {
-                script {
-                    // Switching to root user using sudo su -
-                    sh 'sudo su -'
-                }
-            }
-        }
-
         stage('Install Dependencies') {
             steps {
-                script {
-                    // Install updates and dependencies
-                    sh 'yum update -y'
-                    sh 'yum install -y git wget curl'
-                }
+                // Remove unnecessary root switching stage
+                // Use 'sh' command without sudo since container is running as root
+                sh 'yum update -y'
+                sh 'yum install -y git wget curl'
             }
         }
-
         stage('Build') {
             steps {
-                script {
-                    // Run your build commands here
-                    sh 'echo "Building application..."'
-                }
+                sh 'echo "Building application..."'
             }
         }
-
         stage('Test') {
             steps {
-                script {
-                    // Run your tests here
-                    sh 'echo "Running tests..."'
-                }
+                sh 'echo "Running tests..."'
             }
         }
     }
-
     post {
         always {
             echo 'Cleaning up...'
         }
     }
 }
-
