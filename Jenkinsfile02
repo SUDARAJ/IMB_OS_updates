@@ -6,23 +6,18 @@ pipeline {
         }
     }
     stages {
-        stage('Install AWS CLI, kubectl, and yq') {
+        stage('Install AWS CLI, kubectl, and awk') {
             steps {
                 script {
-                    // Update the package manager and install AWS CLI, kubectl, and yq
+                    // Update the package manager and install AWS CLI, kubectl, and awk
                     sh '''
                     yum update -y
-                    yum install -y aws-cli
+                    yum install -y aws-cli gawk
 
                     # Install kubectl version 1.30
                     curl -LO "https://dl.k8s.io/release/v1.30.0/bin/linux/amd64/kubectl"
                     chmod +x ./kubectl
                     mv ./kubectl /usr/local/bin/kubectl
-
-                    # Install yq
-                    curl -LO "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64"
-                    chmod +x yq_linux_amd64
-                    mv yq_linux_amd64 /usr/local/bin/yq
                     '''
                 }
             }
@@ -33,7 +28,7 @@ pipeline {
                     // Run commands to verify installations
                     sh 'aws --version'
                     sh 'kubectl version --client'
-                    sh 'yq --version'
+                    sh 'gawk --version'
                 }
             }
         }
@@ -54,10 +49,18 @@ pipeline {
                         aws eks update-kubeconfig --name stg-eks --region ap-southeast-2
                         '''
                         
-                        // Check the kubeconfig file and update the apiVersion if necessary using yq
+                        // Check the kubeconfig file and update the apiVersion using awk
                         sh '''
                         if [ -f ~/.kube/config ]; then
-                            yq eval -i '.clusters[].cluster."exec".apiVersion = "client.authentication.k8s.io/v1beta1"' ~/.kube/config || true
+                            # Use awk to add apiVersion after "exec" block
+                            gawk '
+                            /"exec": {/ {
+                                print $0
+                                print "    \"apiVersion\": \"client.authentication.k8s.io/v1beta1\","
+                                next
+                            }
+                            { print }
+                            ' ~/.kube/config > ~/.kube/config.tmp && mv ~/.kube/config.tmp ~/.kube/config
                         fi
                         '''
                         
