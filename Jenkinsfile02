@@ -44,7 +44,7 @@ pipeline {
                         '''
                         
                         // Check the kubeconfig file and update the apiVersion if necessary
-                        if [ -f "$HOME/.kube/config" ]; then
+                        if (fileExists("$HOME/.kube/config")) {
                             sed -i 's/apiVersion: client.authentication.k8s.io/v1alpha1/apiVersion: client.authentication.k8s.io\\/v1beta1/g' "$HOME/.kube/config" || true
                             sed -i 's/apiVersion: client.authentication.k8s.io/v1beta1/apiVersion: client.authentication.k8s.io\\/v1beta1/g' "$HOME/.kube/config" || true
                         fi
