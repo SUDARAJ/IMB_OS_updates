@@ -92,7 +92,9 @@ pipeline {
         
         		# Configure kubectl to use the EKS cluster
         		echo "Connecting to EKS cluster..."
-        		aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks --kubeconfig ~/.kube/config 
+        		kubectl config set-context arn:aws:eks:ap-southeast-2:864923301006:cluster/stg-eks
+	  		kubectl config use-context arn:aws:eks:ap-southeast-2:864923301006:cluster/stg-eks
+			kubectl config current-context
         
         		# Verify kubectl connection
         		kubectl get nodes
