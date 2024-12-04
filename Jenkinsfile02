@@ -5,12 +5,14 @@ pipeline {
         }
     }
     stages {
-        stage('Build') {
-            steps {
-                echo 'Building the application...'
-                // Add your build commands here
+        stage('install aws-cli') {
+            steps {    
+                sh '''
+                yum install -y sudo aws-cli
+                '''
             }
         }
+
         stage('Test') {
             steps {
                 echo 'Running tests...'
