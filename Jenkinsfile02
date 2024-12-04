@@ -44,10 +44,15 @@ pipeline {
                         '''
                         
                         // Check the kubeconfig file and update the apiVersion if necessary
-                        if [ -f ~/.kube/config ]; then
-                            sed -i 's/apiVersion: client.authentication.k8s.io/v1alpha1/apiVersion: client.authentication.k8s.io\/v1beta1/g' ~/.kube/config || true
-                            sed -i 's/apiVersion: client.authentication.k8s.io/v1beta1/apiVersion: client.authentication.k8s.io\/v1beta1/g' ~/.kube/config || true
-                        fi
+                        script {
+                            def kubeConfigFile = "${System.getProperty('user.home')}/.kube/config"
+                            if (new File(kubeConfigFile).exists()) {
+                                sh '''
+                                sed -i 's/apiVersion: client.authentication.k8s.io/v1alpha1/apiVersion: client.authentication.k8s.io\\/v1beta1/g' ''' + kubeConfigFile + ''' || true
+                                sed -i 's/apiVersion: client.authentication.k8s.io/v1beta1/apiVersion: client.authentication.k8s.io\\/v1beta1/g' ''' + kubeConfigFile + ''' || true
+                                '''
+                            }
+                        }
                         
                         // Optionally, you can run a kubectl command to verify the connection
                         sh 'kubectl get nodes'
