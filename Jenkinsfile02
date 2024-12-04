@@ -6,10 +6,10 @@ pipeline {
         }
     }
     stages {
-        stage('Install AWS CLI and kubectl') {
+        stage('Install AWS CLI, kubectl, and yq') {
             steps {
                 script {
-                    // Update the package manager and install AWS CLI and kubectl
+                    // Update the package manager and install AWS CLI, kubectl, and yq
                     sh '''
                     yum update -y
                     yum install -y aws-cli
@@ -18,6 +18,11 @@ pipeline {
                     curl -LO "https://dl.k8s.io/release/v1.30.0/bin/linux/amd64/kubectl"
                     chmod +x ./kubectl
                     mv ./kubectl /usr/local/bin/kubectl
+
+                    # Install yq
+                    curl -LO "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64"
+                    chmod +x yq_linux_amd64
+                    mv yq_linux_amd64 /usr/local/bin/yq
                     '''
                 }
             }
@@ -28,6 +33,7 @@ pipeline {
                     // Run commands to verify installations
                     sh 'aws --version'
                     sh 'kubectl version --client'
+                    sh 'yq --version'
                 }
             }
         }
@@ -48,10 +54,10 @@ pipeline {
                         aws eks update-kubeconfig --name stg-eks --region ap-southeast-2
                         '''
                         
-                        // Check the kubeconfig file and update the apiVersion if necessary
+                        // Check the kubeconfig file and update the apiVersion if necessary using yq
                         sh '''
                         if [ -f ~/.kube/config ]; then
-                            sed -i 's/apiVersion: client.authentication.k8s.io/v1alpha1/apiVersion: client.authentication.k8s.io/v1beta1/g' ~/.kube/config || true
+                            yq eval -i '.clusters[].cluster."exec".apiVersion = "client.authentication.k8s.io/v1beta1"' ~/.kube/config || true
                         fi
                         '''
                         
