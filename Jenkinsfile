@@ -75,22 +75,22 @@ pipeline {
     			}
 		}
 
-	stage('Connect to EKS Cluster') {
+   	stage('Connect to EKS Cluster') {
     		steps {
         		sh '''
-	  		# Remove any existing kubeconfig to prevent errors
-        		rm -f ~/.kube/config
-	  
+        		# Remove any existing kubeconfig to prevent errors
+       			 rm -f ~/.kube/config
+        
         		# Configure kubectl to use the EKS cluster
         		echo "Connecting to EKS cluster..."
-        		aws eks --region ${AWS_REGION} update-kubeconfig --name stg-eks
+        		aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks --kubeconfig ~/.kube/config --api-version client.authentication.k8s.io/v1beta1
         
         		# Verify kubectl connection
         		kubectl get nodes
         		'''
     		}
-		}    
-    
+	}
+	
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker image with tag: ${DOCKER_IMAGE_TAG}..."
