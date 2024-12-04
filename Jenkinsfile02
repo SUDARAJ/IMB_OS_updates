@@ -11,7 +11,6 @@ pipeline {
                 script {
                     // Update the package manager and install AWS CLI and kubectl
                     sh '''
-                    set -e  # Exit immediately if a command exits with a non-zero status
                     yum update -y
                     yum install -y aws-cli
 
@@ -37,24 +36,22 @@ pipeline {
                 script {
                     // Use the withCredentials block to access AWS credentials
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-cred']]) {
-                        // Set AWS environment variables automatically
+                        // Set AWS environment variables
                         sh '''
+                        export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                        export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
                         export AWS_DEFAULT_REGION=ap-southeast-2  # Change to your desired region
-                        aws eks update-kubeconfig --name stg-eks --region $AWS_DEFAULT_REGION
                         '''
-
+                        
+                        // Update kubeconfig to connect to the EKS cluster
+                        sh '''
+                        aws eks update-kubeconfig --name stg-eks --region ap-southeast-2
+                        '''
+                        
                         // Check the kubeconfig file and update the apiVersion if necessary
-                        if (fileExists("$HOME/.kube/config")) {
-                            // Use shell commands to modify the kubeconfig file
-                            sh '''
-                            sed -i 's/apiVersion: client.authentication.k8s.io/v1alpha1/apiVersion: client.authentication.k8s.io/v1beta1/g' "$HOME/.kube/config" || true
-                            sed -i 's/apiVersion: client.authentication.k8s.io/v1beta1/apiVersion: client.authentication.k8s.io/v1/g' "$HOME/.kube/config" || true
-                            '''
-                            
-                            // Print the kubeconfig file to verify changes
-                            cat "$HOME/.kube/config"
-                        }
- 
+                        sed -i 's/apiVersion: client.authentication.k8s.io/v1alpha1/apiVersion: client.authentication.k8s.io\/v1beta1/g' ~/.kube/config || true
+                        sed -i 's/apiVersion: client.authentication.k8s.io/v1beta1/apiVersion: client.authentication.k8s.io\/v1beta1/g' ~/.kube/config || true
+                        
                         // Optionally, you can run a kubectl command to verify the connection
                         sh 'kubectl get nodes'
                     }
