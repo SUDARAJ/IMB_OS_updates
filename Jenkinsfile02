@@ -1,41 +1,60 @@
 pipeline {
-    agent any
-    environment {
-        AWS_REGION = 'ap-southeast-2'
-        CLUSTER_NAME = 'stg-eks' // Name extracted from the provided ARN
-    }
-    stages {
-        stage('Setup AWS CLI and kubectl') {
-            steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-cred']]) {
-                    script {
-                        // Configure AWS CLI with Jenkins credentials
-                        sh """
-                        aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
-                        aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
-                        aws configure set region ${AWS_REGION}
-                        """
-                        
-                        // Update kubeconfig for the EKS cluster
-                        sh """
-                        aws eks update-kubeconfig --region ${AWS_REGION} --name ${CLUSTER_NAME}
-                        """
-                    }
-                }
-            }
+    agent {
+        docker {
+            image 'amazonlinux:2'
+            label 'docker'
+            args '-v /tmp:/tmp'  // Optional, map a local volume to the container
         }
-        stage('List Namespaces in EKS') {
+    }
+
+    environment {
+        // Ensure root user is used for all steps
+        DOCKER_USER = 'root'
+    }
+
+    stages {
+        stage('Switch to root') {
             steps {
                 script {
-                    // List namespaces in the EKS cluster
-                    sh 'kubectl get ns'
+                    // Switching to root user using sudo su -
+                    sh 'sudo su -'
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    // Install updates and dependencies
+                    sh 'yum update -y'
+                    sh 'yum install -y git wget curl'
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    // Run your build commands here
+                    sh 'echo "Building application..."'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    // Run your tests here
+                    sh 'echo "Running tests..."'
                 }
             }
         }
     }
+
     post {
         always {
-            echo 'Pipeline completed.'
+            echo 'Cleaning up...'
         }
     }
 }
+
