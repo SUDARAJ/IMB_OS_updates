@@ -35,23 +35,26 @@ pipeline {
                 git branch: 'main', url: "${env.GIT_REPO_URL}"
             }
         }
-        stage('Login to AWS ECR') {
-            steps {
-                echo 'Logging in to AWS ECR...'
-                sh """
-                # Configure AWS CLI
-                aws configure set aws_access_key_id AKIA4SYLSGSHHXB5P6NA
-                aws configure set aws_secret_access_key 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
-                aws configure set region ap-southeast-2
-                
-                # Login to ECR
-                aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin ${REPO_NAME}
-                
-                # Verify ECR repository exists
-                aws ecr describe-repositories --repository-names support-automations
-                """
-            }
-        }
+		stage('Login to AWS ECR') {
+			steps {
+				echo 'Logging in to AWS ECR...'
+				withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-cred']]) {
+					sh """
+					# Configure AWS CLI
+					aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+					aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+					aws configure set region ap-southeast-2
+					
+					# Login to ECR
+					aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin ${REPO_NAME}
+					
+					# Verify ECR repository exists
+					aws ecr describe-repositories --repository-names support-automations
+					"""
+				}
+			}
+		}
+
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker image with tag: ${DOCKER_IMAGE_TAG}..."
