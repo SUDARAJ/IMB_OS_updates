@@ -17,9 +17,9 @@ pipeline {
             steps {
                 sh '''
                 # Update package manager and install dependencies
-                yum update -y > /dev/null 2>&1
+                # yum update -y 
                 amazon-linux-extras enable docker
-                yum install -y sudo git > /dev/null 2>&1
+                yum install -y sudo git 
                 # Start Docker daemon
                 echo "Starting Docker daemon..."
                 dockerd &
