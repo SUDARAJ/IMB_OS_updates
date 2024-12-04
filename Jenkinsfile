@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'amazonlinux:2'
+            image 'aws/codebuild/standard:5.0'  // AWS CodeBuild standard image
             // Remove the --privileged flag and use root user
             args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
         }
@@ -19,11 +19,11 @@ pipeline {
                 # Update package manager and install dependencies
                 yum update -y > /dev/null 2>&1
                 amazon-linux-extras enable docker
-                yum install -y sudo aws-cli docker git > /dev/null 2>&1
+                yum install -y sudo git > /dev/null 2>&1
                 # Start Docker daemon
                 echo "Starting Docker daemon..."
                 dockerd &
-
+                
                 echo "Verifying Docker installation..."
                 docker --version
                 '''
@@ -117,7 +117,6 @@ pipeline {
             }
         }
 
-
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker image with tag: ${DOCKER_IMAGE_TAG}..."
@@ -138,4 +137,3 @@ pipeline {
         }
     }
 }
-
