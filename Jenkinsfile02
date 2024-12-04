@@ -60,7 +60,7 @@ pipeline {
                         // Check the kubeconfig file and update the apiVersion if necessary using yq
                         sh '''
                         if [ -f ~/.kube/config ]; then
-                            yq eval '.clusters[].cluster."exec".apiVersion = "client.authentication.k8s.io/v1"' -i ~/.kube/config || true
+                            yq eval '.users[].user."exec".apiVersion = "client.authentication.k8s.io/v1"' -i /root/.kube/config
                         fi
                         '''
                         
