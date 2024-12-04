@@ -52,7 +52,6 @@ pipeline {
                         sh '''
                         if [ -f ~/.kube/config ]; then
                             sed -i 's/apiVersion: client.authentication.k8s.io/v1alpha1/apiVersion: client.authentication.k8s.io/v1beta1/g' ~/.kube/config || true
-                            sed -i 's/apiVersion: client.authentication.k8s.io/v1beta1/apiVersion: client.authentication.k8s.io/v1beta1/g' ~/.kube/config || true
                         fi
                         '''
                         
