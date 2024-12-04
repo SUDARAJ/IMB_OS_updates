@@ -1,28 +1,45 @@
 pipeline {
+    // Use the latest Docker image as the agent for this pipeline
     agent {
-        docker 'docker:latest' // Use the latest Docker image
+        docker 'docker:latest'
     }
+    
+    // Define the stages of the pipeline
     stages {
+        // Stage for running commands as root
         stage('Run Commands as Root') {
             steps {
                 script {
-                    // Change to root user and verify
+                    // Inform about switching to root user
                     echo 'Switching to root user'
-                    sh 'whoami'  // This should print "root"
                     
-                    // Example: Running a Docker command as root
+                    // Verify current user (should print "root")
+                    sh 'whoami'  
+                    
+                    // Display Docker version
                     echo 'Running Docker version command'
                     sh 'docker --version'
+                    
+                    // Additional example commands could be added here
+                    // For instance:
+                    // sh 'docker images'
+                    // sh 'docker ps'
                 }
             }
         }
     }
+    
+    // Post-build actions that run after the stages
     post {
+        // Always runs, regardless of build status
         always {
             echo 'Cleaning up...'
         }
+        
+        // Optional additional post-build actions could include:
+        // success { ... }
+        // failure { ... }
+        // cleanup { ... }
     }
-}
-   }
 }
 
