@@ -1,40 +1,48 @@
 pipeline {
     agent {
-        docker {
-            image 'docker:latest'
-        }
+        docker 'docker:latest' // Use the latest Docker image
     }
     stages {
-        stage('install aws-cli') {
-            steps {    
-                sh '''
-                yum install -y sudo aws-cli
-                '''
+        stage('Install AWS CLI') {
+            steps {
+                script {
+                    // Install the AWS CLI in the Docker container
+                    echo 'Installing AWS CLI'
+                    sh 'apk add --no-cache python3 py3-pip'  // Install Python3 and pip
+                    sh 'pip3 install awscli --upgrade --user' // Install the AWS CLI using pip
+                    sh 'aws --version'  // Verify AWS CLI installation
+                }
             }
         }
-
+        stage('Build') {
+            steps {
+                script {
+                    // Build commands go here
+                    echo 'Building application'
+                }
+            }
+        }
         stage('Test') {
             steps {
-                echo 'Running tests...'
-                // Add your test commands here
+                script {
+                    // Test commands go here
+                    echo 'Running tests'
+                }
             }
         }
         stage('Deploy') {
             steps {
-                echo 'Deploying the application...'
-                // Add your deploy commands here
+                script {
+                    // Deployment commands go here
+                    echo 'Deploying application'
+                }
             }
         }
     }
     post {
         always {
-            echo 'Pipeline completed!'
-        }
-        success {
-            echo 'Pipeline executed successfully.'
-        }
-        failure {
-            echo 'Pipeline failed. Please check the logs.'
+            echo 'Cleaning up...'
         }
     }
 }
+
