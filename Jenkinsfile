@@ -1,4 +1,3 @@
-
 pipeline {
     agent {
         docker {
@@ -36,34 +35,30 @@ pipeline {
                 git branch: 'main', url: "${env.GIT_REPO_URL}"
             }
         }
-	stage('Configure AWS CLI') {
-		steps {
-			echo 'Logging in to AWS ECR...'
-			withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-cred']]) {
-				sh """
-				# Configure AWS CLI
-				aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-				aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-				aws configure set region ap-southeast-2	
-				"""
-				}
-			}
-		}
-	    
-
-	    
-        stage('Login to ECR') {
+        stage('Configure AWS CLI') {
             steps {
-		sh """
-                # Login to ECR
-		aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin ${REPO_NAME}
-					
-		# Verify ECR repository exists
-		aws ecr describe-repositories --repository-names support-automations
-		"""
+                echo 'Logging in to AWS ECR...'
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-cred']]) {
+                    sh """
+                    # Configure AWS CLI
+                    aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+                    aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+                    aws configure set region ap-southeast-2	
+                    """
+                }
             }
         }
-	    
+        stage('Login to ECR') {
+            steps {
+                sh """
+                # Login to ECR
+                aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin ${REPO_NAME}
+					
+                # Verify ECR repository exists
+                aws ecr describe-repositories --repository-names support-automations
+                """
+            }
+        }
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker image with tag: ${DOCKER_IMAGE_TAG}..."
@@ -76,6 +71,24 @@ pipeline {
                 sh "docker push ${REPO_NAME}:${DOCKER_IMAGE_TAG}"
             }
         }
+        stage('Install kubectl') {
+            steps {
+                echo 'Installing kubectl...'
+                sh """
+                # Download the latest stable version of kubectl
+                curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+	
+                # Make the kubectl binary executable
+                chmod +x kubectl
+	
+                # Move the kubectl binary to a directory included in PATH
+                mv kubectl /usr/local/bin/
+	
+                # Verify kubectl installation
+                kubectl version --client
+                """
+            }
+        }	
     }
     post {
         always {
