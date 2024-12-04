@@ -1,45 +1,41 @@
 pipeline {
-    // Use the latest Docker image as the agent for this pipeline
-    agent {
-        docker 'docker:latest'
+    agent any
+    environment {
+        AWS_REGION = 'ap-southeast-2'
+        CLUSTER_NAME = 'stg-eks' // Name extracted from the provided ARN
     }
-    
-    // Define the stages of the pipeline
     stages {
-        // Stage for running commands as root
-        stage('Run Commands as Root') {
+        stage('Setup AWS CLI and kubectl') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-cred']]) {
+                    script {
+                        // Configure AWS CLI with Jenkins credentials
+                        sh """
+                        aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
+                        aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
+                        aws configure set region ${AWS_REGION}
+                        """
+                        
+                        // Update kubeconfig for the EKS cluster
+                        sh """
+                        aws eks update-kubeconfig --region ${AWS_REGION} --name ${CLUSTER_NAME}
+                        """
+                    }
+                }
+            }
+        }
+        stage('List Namespaces in EKS') {
             steps {
                 script {
-                    // Inform about switching to root user
-                    echo 'Switching to root user'
-                    
-                    // Verify current user (should print "root")
-                    sh 'whoami'  
-                    
-                    // Display Docker version
-                    echo 'Running Docker version command'
-                    sh 'docker --version'
-                    
-                    // Additional example commands could be added here
-                    // For instance:
-                    // sh 'docker images'
-                    // sh 'docker ps'
+                    // List namespaces in the EKS cluster
+                    sh 'kubectl get ns'
                 }
             }
         }
     }
-    
-    // Post-build actions that run after the stages
     post {
-        // Always runs, regardless of build status
         always {
-            echo 'Cleaning up...'
+            echo 'Pipeline completed.'
         }
-        
-        // Optional additional post-build actions could include:
-        // success { ... }
-        // failure { ... }
-        // cleanup { ... }
     }
 }
-
