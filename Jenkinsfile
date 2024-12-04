@@ -84,23 +84,31 @@ pipeline {
 	    }
 	}
 
-   	stage('Connect to EKS Cluster') {
-    		steps {
-        		sh '''
-        		# Remove any existing kubeconfig to prevent errors
-       			 rm -f ~/.kube/config
-        
-        		# Configure kubectl to use the EKS cluster
-        		echo "Connecting to EKS cluster..."
-        		kubectl config set-context arn:aws:eks:ap-southeast-2:864923301006:cluster/stg-eks
-	  		kubectl config use-context arn:aws:eks:ap-southeast-2:864923301006:cluster/stg-eks
-			kubectl config current-context
-        
-        		# Verify kubectl connection
-        		kubectl get nodes
-        		'''
-    		}
+	stage('Connect to EKS Cluster') {
+	    steps {
+	        sh '''
+	        # Exit on any error
+	        set -e
+	
+	        # Remove any existing kubeconfig to prevent errors
+	        echo "Removing any existing kubeconfig..."
+	        rm -f ~/.kube/config
+	
+	        # Configure kubectl to use the EKS cluster
+	        echo "Connecting to EKS cluster..."
+	        aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks
+	
+	        # Verify the current context and server URL
+	        echo "Current kubectl context:"
+	        kubectl config view --minify
+	
+	        # Verify kubectl connection
+	        echo "Verifying kubectl connection..."
+	        kubectl get nodes
+	        '''
+	    }
 	}
+
 	
         stage('Build Docker Image') {
             steps {
