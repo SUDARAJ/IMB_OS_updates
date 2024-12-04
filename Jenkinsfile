@@ -78,6 +78,9 @@ pipeline {
 	stage('Connect to EKS Cluster') {
     		steps {
         		sh '''
+	  		# Remove any existing kubeconfig to prevent errors
+        		rm -f ~/.kube/config
+	  
         		# Configure kubectl to use the EKS cluster
         		echo "Connecting to EKS cluster..."
         		aws eks --region ${AWS_REGION} update-kubeconfig --name stg-eks
