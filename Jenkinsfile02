@@ -61,7 +61,7 @@ pipeline {
                         sh '''
                         if [ -f ~/.kube/config ]; then
                             yq eval '.users[].user."exec".apiVersion = "client.authentication.k8s.io/v1"' -i /root/.kube/config
-                            yq eval '.users[].user."exec".interactiveMode = "Disabled"' -i /root/.kube/config
+                            yq eval '.users[].user."exec".interactiveMode = "IfAvailable"' -i /root/.kube/config
 
                         fi
                         '''
