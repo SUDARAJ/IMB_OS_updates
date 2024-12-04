@@ -6,10 +6,10 @@ pipeline {
         stage('Install AWS CLI') {
             steps {
                 script {
-                    // Install the AWS CLI in the Docker container
+                    // Install AWS CLI with root privileges
                     echo 'Installing AWS CLI'
-                    sh 'apk add --no-cache python3 py3-pip'  // Install Python3 and pip
-                    sh 'pip3 install awscli --upgrade --user' // Install the AWS CLI using pip
+                    sh 'apk add --no-cache python3 py3-pip --user=root'  // Install Python3 and pip with root privileges
+                    sh 'pip3 install awscli --upgrade --user=root' // Install AWS CLI using pip with root privileges
                     sh 'aws --version'  // Verify AWS CLI installation
                 }
             }
@@ -45,4 +45,3 @@ pipeline {
         }
     }
 }
-
