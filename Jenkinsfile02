@@ -1,37 +1,35 @@
 pipeline {
     agent {
         docker {
-            image 'amazonlinux:2'
-            label 'docker'
-            // Remove unnecessary volume mapping
+            image 'amazonlinux:2'  // Use Amazon Linux 2 as the Docker image
+            args '-u root'         // Run as root user
         }
-    }
-    environment {
-        DOCKER_USER = 'root'
     }
     stages {
-        stage('Install Dependencies') {
+        stage('Install Packages') {
             steps {
-                // Remove unnecessary root switching stage
-                // Use 'sh' command without sudo since container is running as root
-                sh 'yum update -y'
-                sh 'yum install -y git wget curl'
+                script {
+                    // Update the package manager and install some packages
+                    sh '''
+                    yum update -y
+                    yum install -y git curl
+                    '''
+                }
             }
         }
-        stage('Build') {
+        stage('Run Command') {
             steps {
-                sh 'echo "Building application..."'
-            }
-        }
-        stage('Test') {
-            steps {
-                sh 'echo "Running tests..."'
+                script {
+                    // Run a simple command to verify installation
+                    sh 'git --version'
+                    sh 'curl --version'
+                }
             }
         }
     }
     post {
         always {
-            echo 'Cleaning up...'
+            echo 'Pipeline completed.'
         }
     }
 }
