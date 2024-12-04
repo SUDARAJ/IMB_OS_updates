@@ -44,14 +44,12 @@ pipeline {
                         '''
                         
                         // Check the kubeconfig file and update the apiVersion if necessary
-                        script {
-                            def kubeConfigFile = "${System.getProperty('user.home')}/.kube/config"
-                            if (new File(kubeConfigFile).exists()) {
-                                sh '''
-                                sed -i 's/apiVersion: client.authentication.k8s.io/v1alpha1/apiVersion: client.authentication.k8s.io\\/v1beta1/g' ''' + kubeConfigFile + ''' || true
-                                sed -i 's/apiVersion: client.authentication.k8s.io/v1beta1/apiVersion: client.authentication.k8s.io\\/v1beta1/g' ''' + kubeConfigFile + ''' || true
-                                '''
-                            }
+                        def kubeConfigFile = "${env.HOME}/.kube/config"
+                        if (new File(kubeConfigFile).exists()) {
+                            sh '''
+                            sed -i 's/apiVersion: client.authentication.k8s.io/v1alpha1/apiVersion: client.authentication.k8s.io\\/v1beta1/g' ''' + kubeConfigFile + ''' || true
+                            sed -i 's/apiVersion: client.authentication.k8s.io/v1beta1/apiVersion: client.authentication.k8s.io\\/v1beta1/g' ''' + kubeConfigFile + ''' || true
+                            '''
                         }
                         
                         // Optionally, you can run a kubectl command to verify the connection
