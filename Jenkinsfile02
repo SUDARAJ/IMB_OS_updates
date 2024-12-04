@@ -6,23 +6,22 @@ pipeline {
         }
     }
     stages {
-        stage('Install Packages') {
+        stage('Install AWS CLI') {
             steps {
                 script {
-                    // Update the package manager and install some packages
+                    // Update the package manager and install AWS CLI
                     sh '''
                     yum update -y
-                    yum install -y git curl
+                    yum install -y aws-cli
                     '''
                 }
             }
         }
-        stage('Run Command') {
+        stage('Verify AWS CLI Installation') {
             steps {
                 script {
-                    // Run a simple command to verify installation
-                    sh 'git --version'
-                    sh 'curl --version'
+                    // Run a command to verify AWS CLI installation
+                    sh 'aws --version'
                 }
             }
         }
