@@ -97,6 +97,10 @@ pipeline {
 	        # Configure kubectl to use the EKS cluster
 	        echo "Connecting to EKS cluster..."
 	        aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks
+
+  		# Manually update the apiVersion to v1beta1 in kubeconfig
+                echo "Updating apiVersion to v1beta1 in kubeconfig..."
+                sed -i 's/client.authentication.k8s.io\/v1alpha1/client.authentication.k8s.io\/v1beta1/g' ~/.kube/config
 	
 	        # Verify the current context and server URL
 	        echo "Current kubectl context:"
