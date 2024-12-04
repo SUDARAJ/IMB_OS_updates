@@ -6,22 +6,28 @@ pipeline {
         }
     }
     stages {
-        stage('Install AWS CLI') {
+        stage('Install AWS CLI and kubectl') {
             steps {
                 script {
-                    // Update the package manager and install AWS CLI
+                    // Update the package manager and install AWS CLI and kubectl
                     sh '''
                     yum update -y
                     yum install -y aws-cli
+
+                    # Install the latest version of kubectl
+                    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+                    chmod +x ./kubectl
+                    mv ./kubectl /usr/local/bin/kubectl
                     '''
                 }
             }
         }
-        stage('Verify AWS CLI Installation') {
+        stage('Verify Installations') {
             steps {
                 script {
-                    // Run a command to verify AWS CLI installation
+                    // Run commands to verify installations
                     sh 'aws --version'
+                    sh 'kubectl version --client'
                 }
             }
         }
