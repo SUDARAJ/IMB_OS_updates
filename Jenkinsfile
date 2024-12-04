@@ -59,6 +59,22 @@ pipeline {
                 """
             }
         }
+
+	stage('Install kubectl') {
+    		steps {
+        		sh '''
+        		# Install kubectl
+        		echo "Installing kubectl..."
+        		curl -LO "https://dl.k8s.io/release/v1.27.4/bin/linux/amd64/kubectl"
+        		chmod +x ./kubectl
+        		mv ./kubectl /usr/local/bin/kubectl
+        
+        		# Verify kubectl installation
+        		kubectl version --client
+        		'''
+    			}
+		}
+    
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker image with tag: ${DOCKER_IMAGE_TAG}..."
