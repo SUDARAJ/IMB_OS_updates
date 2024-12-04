@@ -92,7 +92,7 @@ pipeline {
         
         		# Configure kubectl to use the EKS cluster
         		echo "Connecting to EKS cluster..."
-        		aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks --kubeconfig ~/.kube/config --api-version client.authentication.k8s.io/v1beta1
+        		aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks --kubeconfig ~/.kube/config 
         
         		# Verify kubectl connection
         		kubectl get nodes
