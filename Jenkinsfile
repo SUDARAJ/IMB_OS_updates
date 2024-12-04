@@ -43,7 +43,7 @@ pipeline {
                     # Configure AWS CLI
                     aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
                     aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-                    aws configure set region ap-southeast-2	
+                    aws configure set region ap-southeast-2    
                     """
                 }
             }
@@ -53,67 +53,66 @@ pipeline {
                 sh """
                 # Login to ECR
                 aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin ${REPO_NAME}
-					
+                
                 # Verify ECR repository exists
                 aws ecr describe-repositories --repository-names support-automations
                 """
             }
         }
 
-	stage('Install kubectl') {
-	    steps {
-	        sh '''
-	        # Install kubectl
-	        echo "Installing kubectl..."
-	        
-	        # Get the latest version of kubectl
-	        KUBECTL_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
-	        
-	        # Download the latest kubectl
-	        curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
-	        
-	        # Make the kubectl binary executable
-	        chmod +x ./kubectl
-	        
-	        # Move kubectl to /usr/local/bin
-	        mv ./kubectl /usr/local/bin/kubectl
-	        
-	        # Verify kubectl installation
-	        kubectl version --client
-	        '''
-	    }
-	}
+        stage('Install kubectl') {
+            steps {
+                sh '''
+                # Install kubectl
+                echo "Installing kubectl..."
+                
+                # Get the latest version of kubectl
+                KUBECTL_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
+                
+                # Download the latest kubectl
+                curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+                
+                # Make the kubectl binary executable
+                chmod +x ./kubectl
+                
+                # Move kubectl to /usr/local/bin
+                mv ./kubectl /usr/local/bin/kubectl
+                
+                # Verify kubectl installation
+                kubectl version --client
+                '''
+            }
+        }
 
-	stage('Connect to EKS Cluster') {
-	    steps {
-	        sh '''
-	        # Exit on any error
-	        set -e
-	
-	        # Remove any existing kubeconfig to prevent errors
-	        echo "Removing any existing kubeconfig..."
-	        rm -f ~/.kube/config
-	
-	        # Configure kubectl to use the EKS cluster
-	        echo "Connecting to EKS cluster..."
-	        aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks
+        stage('Connect to EKS Cluster') {
+            steps {
+                sh '''
+                # Exit on any error
+                set -e
 
-  		# Manually update the apiVersion to v1beta1 in kubeconfig
+                # Remove any existing kubeconfig to prevent errors
+                echo "Removing any existing kubeconfig..."
+                rm -f ~/.kube/config
+
+                # Configure kubectl to use the EKS cluster
+                echo "Connecting to EKS cluster..."
+                aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks
+
+                # Manually update the apiVersion to v1beta1 in kubeconfig
                 echo "Updating apiVersion to v1beta1 in kubeconfig..."
-                sed -i 's#client.authentication.k8s.io/v1alpha1#client.authentication.k8s.io/v1beta1#g' /root/.kube/config
-	
-	        # Verify the current context and server URL
-	        echo "Current kubectl context:"
-	        kubectl config view --minify
-	
-	        # Verify kubectl connection
-	        echo "Verifying kubectl connection..."
-	        kubectl get nodes
-	        '''
-	    }
-	}
+                sed -i 's#client.authentication.k8s.io/v1alpha1#client.authentication.k8s.io/v1beta1#g' /home/jenkins/.kube/config
 
-	
+                # Verify the current context and server URL
+                echo "Current kubectl context:"
+                kubectl config view --minify
+
+                # Verify kubectl connection
+                echo "Verifying kubectl connection..."
+                kubectl get nodes
+                '''
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker image with tag: ${DOCKER_IMAGE_TAG}..."
@@ -134,3 +133,4 @@ pipeline {
         }
     }
 }
+
