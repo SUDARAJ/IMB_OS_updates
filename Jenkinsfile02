@@ -14,8 +14,8 @@ pipeline {
                     yum update -y
                     yum install -y aws-cli
 
-                    # Install the latest version of kubectl
-                    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+                    # Install kubectl version 1.30
+                    curl -LO "https://dl.k8s.io/release/v1.30.0/bin/linux/amd64/kubectl"
                     chmod +x ./kubectl
                     mv ./kubectl /usr/local/bin/kubectl
                     '''
@@ -47,6 +47,9 @@ pipeline {
                         sh '''
                         aws eks update-kubeconfig --name stg-eks --region ap-southeast-2
                         '''
+                        
+                        // Check the kubeconfig file and update the apiVersion if necessary
+                        sed -i 's/apiVersion: client.authentication.k8s.io\/v1alpha1/apiVersion: client.authentication.k8s.io\/v1beta1/g' ~/.kube/config || true
                         
                         // Optionally, you can run a kubectl command to verify the connection
                         sh 'kubectl get nodes'
