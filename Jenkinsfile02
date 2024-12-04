@@ -42,17 +42,15 @@ pipeline {
                         export AWS_DEFAULT_REGION=ap-southeast-2  # Change to your desired region
                         aws eks update-kubeconfig --name stg-eks --region $AWS_DEFAULT_REGION
                         '''
-                        
+
                         // Check the kubeconfig file and update the apiVersion if necessary
                         if (fileExists("$HOME/.kube/config")) {
-                        // Use shell commands to modify the kubeconfig file
-                        sh '''
-                        sed -i -e 's/apiVersion: client.authentication.k8s.io\/v1alpha1/apiVersion: client.authentication.k8s.io\/v1beta1/g' \
-                             -e 's/apiVersion: client.authentication.k8s.io\/v1beta1/apiVersion: client.authentication.k8s.io\/v1/g' \
-                             "$HOME/.kube/config" || true
-                        '''
-                }
-                        
+                            sh '''
+                            sed -i 's/apiVersion: client.authentication.k8s.io/v1alpha1/apiVersion: client.authentication.k8s.io/v1beta1/g' "$HOME/.kube/config" || true
+                            sed -i 's/apiVersion: client.authentication.k8s.io/v1beta1/apiVersion: client.authentication.k8s.io/v1/g' "$HOME/.kube/config" || true
+                            '''
+                        }
+ 
                         // Optionally, you can run a kubectl command to verify the connection
                         sh 'kubectl get nodes'
                     }
