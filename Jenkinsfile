@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'aws/codebuild/standard:5.0'  // AWS CodeBuild standard image
+            image 'amazonlinux:2'
             // Remove the --privileged flag and use root user
             args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
         }
@@ -19,11 +19,11 @@ pipeline {
                 # Update package manager and install dependencies
                 yum update -y > /dev/null 2>&1
                 amazon-linux-extras enable docker
-                yum install -y sudo git > /dev/null 2>&1
+                yum install -y sudo aws-cli docker git > /dev/null 2>&1
                 # Start Docker daemon
                 echo "Starting Docker daemon..."
                 dockerd &
-                
+
                 echo "Verifying Docker installation..."
                 docker --version
                 '''
@@ -80,6 +80,39 @@ pipeline {
                 
                 # Verify kubectl installation
                 kubectl version --client
+                '''
+            }
+        }
+
+        stage('Connect to EKS Cluster') {
+            steps {
+                sh '''
+                # Exit on any error
+                set -e
+        
+                # Remove any existing kubeconfig to prevent errors
+                echo "Removing any existing kubeconfig..."
+                rm -f ~/.kube/config
+        
+                # Configure kubectl to use the EKS cluster
+                echo "Connecting to EKS cluster..."
+                aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks
+        
+                # Ensure the .kube directory exists before modifying the config
+                echo "Ensuring .kube directory exists..."
+                mkdir -p /root/.kube
+        
+                # Manually update the apiVersion to v1beta1 in kubeconfig
+                echo "Updating apiVersion to v1beta1 in kubeconfig..."
+                sed -i 's#client.authentication.k8s.io/v1alpha1#client.authentication.k8s.io/v1beta1#g' /root/.kube/config
+        
+                # Verify the current context and server URL
+                echo "Current kubectl context:"
+                kubectl config view --minify
+        
+                # Verify kubectl connection
+                echo "Verifying kubectl connection..."
+                kubectl get nodes
                 '''
             }
         }
