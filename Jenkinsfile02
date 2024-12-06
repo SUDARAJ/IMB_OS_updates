@@ -38,7 +38,7 @@ pipeline {
                     sh 'aws --version'
                     sh 'kubectl version --client'
                     sh 'yq --version'
-                    sh 'eksctl version
+                    sh 'eksctl version'
                 }
             }
         }
