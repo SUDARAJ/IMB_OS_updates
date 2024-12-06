@@ -70,7 +70,7 @@ pipeline {
                         '''
 
                         sh 'export KUBECONFIG=/root/.kube/config'
-
+                        sh 'ls -l /root/.kube/config'
 
                         // Debug: Print the kubeconfig file
                         sh 'cat /root/.kube/config'                        
