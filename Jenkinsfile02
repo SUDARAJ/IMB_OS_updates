@@ -60,21 +60,12 @@ pipeline {
                         // Update kubeconfig to connect to the EKS cluster
                         sh '''
                         aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks
-                        kubectl config set clusters.stg-eks.cluster.certificate-authority-data "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJd01EWXhNVEExTURjMU4xb1hEVE13TURZd09UQTFNRGMxTjFvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBSzhvCjhNQWNNa1hLd01LV0VpZmJNWGprRW5Mdm5JOUFyQk1OWTQxMHU5dnVYTkUwY3FvTU5CMEQ1d3FZOTZNY3NuSm4KTE9nL0x4SHVyS0JyYjRNVmM4aWsraXNHQjRGRDZUWWdtUHhMKzJQZVdUMXZZSGVRVnIvdHVFdnpCUjVXbDV1ZwpXT0pHWTRETDlrV2dVeEVCWUtlaU9wY2xHMmNWcXF4T1NyejFiaE40bmVzZWdZOTZKZTRManJlL01vaXBBZ0tOCk1BWndvd293T1cyZzZkcDFoeHVPRGVCMUNKM0ZZdnBQMnFvMWwvMXhaM0I2WjJCQmViT2c0a3NsQ0ppR3JmaUwKTGhXZU56OUkvWEp0TzhMWkZnRjdvbURMM0w3QVg3RE4rNUkxbnRDaFljUWdLSEJPRGFrREQ2TW9mOHNBam4ybgpoeEJvNEdDaU93N2hndFNSQnlFQ0F3RUFBYU1qTUNFd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQFY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFHZFFUa280YWhOelBhTE1YZEs0cGFLcDcvK0wKY2ZXRGFkck9yQVA2YzJmNUFUVDZwM2grc0lsK3pEemp3ZHpPRHgxSGg2c2xod0VJR1lDSnlwbUJaZjFNRVo4NQphUjZXb0VwV3VEL0N6M0NXTmJtQUpBeE1aNGlEU041RnZyd1FWZjZOdk5mVWViZy9DN1c0Wkl6OGRJTFhSbTRpClRvNDZPaE1MWEE3WG9UWm44dW40STNrVGlrS2Z1QTRyYzdWV2NpeEgrVFRTT015QWVmd3RWTE1LZ0huV3orM0QKMUNZaDQ5U1g3OFBzbVc4aGZEL1k5cFI4bWF1aEU0bGN0NXBSU0p3ZlEzQUEwZ3FqTGE3N0l2S2hSUGJrS3ZrZQpKODJSc1BnQ2NYNmxiSk8yb243SGJheEs4UDhJNm5mUThKU0psOW1JSThBN3g5ODRJSTVINWZqcUNMdz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo="
-                        kubectl config set clusters.stg-eks.cluster.server "https://7F4D64EE1D996E6401BC6EA932659704.yl4.ap-southeast-2.eks.amazonaws.com"
-
-                        kubectl config set contexts.stg-eks.context.cluster "arn:aws:eks:ap-southeast-2:864923301006:cluster/stg-eks"
-                        kubectl config set contexts.stg-eks.context.user "arn:aws:eks:ap-southeast-2:864923301006:cluster/stg-eks"
                         
                         kubectl config set users.stg-eks.user.exec.apiVersion "client.authentication.k8s.io/v1beta1"
-                        kubectl config set users.stg-eks.user.exec.args --region ap-southeast-2 --eks get-token --cluster-name stg-eks
-                        kubectl config set users.stg-eks.user.exec.command "aws"
                         kubectl config set users.stg-eks.user.exec.interactiveMode "IfAvailable"
-                        kubectl config set users.stg-eks.user.exec.provideClusterInfo false
 
                         kubectl config set current-context "arn:aws:eks:ap-southeast-2:864923301006:cluster/stg-eks"
                         kubectl config use current-context "arn:aws:eks:ap-southeast-2:864923301006:cluster/stg-eks"
-
 
                         '''
                         
