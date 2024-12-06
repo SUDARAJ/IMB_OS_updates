@@ -72,7 +72,7 @@ pipeline {
 
                         // re-Update kubeconfig to connect to the EKS cluster
                         sh '''
-                        aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks
+                        aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks --no-verify-ssl
                         '''
 
                         // Optionally, you can run a kubectl command to verify the connection
