@@ -60,6 +60,8 @@ pipeline {
                         // Update kubeconfig to connect to the EKS cluster
                         sh '''
                         eksctl utils write-kubeconfig --region ap-southeast-2 --cluster stg-eks
+                        kubectl config set users.IMB-Support-supunj@stg-eks.ap-southeast-2.eks.amazonaws.com.exec.interactiveMode IfAvailable
+
                         '''
                         
                         // Debug: Print the kubeconfig file
