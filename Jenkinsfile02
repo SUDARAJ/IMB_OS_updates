@@ -25,10 +25,10 @@ pipeline {
                     mv yq_linux_amd64 /usr/local/bin/yq
 
                     # Install eksctl (latest version)
-                    PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]') # Determine platform (linux, darwin, etc.)
+                    
                     curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_linux_amd64.tar.gz"
                     tar -xzf eksctl_$PLATFORM.tar.gz -C /usr/local/bin
-                    rm eksctl_$PLATFORM.tar.gz # Cleanup the tar file
+                    rm eksctl_linux_amd64.tar.gz # Cleanup the tar file
 
                     '''
                 }
