@@ -66,7 +66,7 @@ pipeline {
                         sh 'cat ~/.kube/config'
 
                         sh '''
-                        kubectl config set users.stg-eks.user.exec.apiVersion "client.authentication.k8s.io/v1beta1"
+                        
                         kubectl config set users.stg-eks.user.exec.interactiveMode "IfAvailable"
 
                         kubectl config set current-context "arn:aws:eks:ap-southeast-2:864923301006:cluster/stg-eks"
