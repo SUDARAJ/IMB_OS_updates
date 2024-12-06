@@ -73,7 +73,7 @@ pipeline {
                         sh 'cat ~/.kube/config'                        
 
                         // Optionally, you can run a kubectl command to verify the connection
-                        sh 'kubectl get nodes'
+                        // sh 'kubectl get nodes'
                     }
                 }
             }
