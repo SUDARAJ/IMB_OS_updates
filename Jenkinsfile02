@@ -27,7 +27,7 @@ pipeline {
                     # Install eksctl (latest version)
                     curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_linux_amd64.tar.gz"
                     tar -xzf eksctl_linux_amd64.tar.gz eksctl
-                    sudo mv eksctl /usr/local/bin/
+                    mv eksctl /usr/local/bin/
                     rm eksctl_linux_amd64.tar.gz # Cleanup the tar file
 
                     '''
