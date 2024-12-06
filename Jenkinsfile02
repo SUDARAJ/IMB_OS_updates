@@ -59,26 +59,11 @@ pipeline {
                         
                         // Update kubeconfig to connect to the EKS cluster
                         sh '''
-                        aws eks update-kubeconfig --name stg-eks --region ap-southeast-2
-                        '''
-
-                        // Debug: Print the kubeconfig file
-                        sh 'cat ~/.kube/config'
-
-                        // Check the kubeconfig file and update the apiVersion if necessary using yq
-                        sh '''
-                        if [ -f ~/.kube/config ]; then
-                            
-                            yq eval '.users[].user."exec".apiVersion = "client.authentication.k8s.io/v1beta1"' -i /root/.kube/config
-                            yq eval '.users[].user."exec".interactiveMode = "IfAvailable"' -i /root/.kube/config
-
-                        fi
+                        eksctl utils write-kubeconfig --region ap-southeast-2 --cluster stg-eks
                         '''
                         
                         // Debug: Print the kubeconfig file
                         sh 'cat ~/.kube/config'
-
-
 
                         // Optionally, you can run a kubectl command to verify the connection
                         sh 'kubectl get nodes'
