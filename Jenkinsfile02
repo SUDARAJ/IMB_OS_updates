@@ -62,9 +62,6 @@ pipeline {
                         aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks
                         '''
 
-                        // Debug: Print the kubeconfig file
-                        sh 'cat ~/.kube/config'
-
                         sh '''
                         # Manually add interactiveMode to the kubeconfig file
                         yq eval '.users[] | select(.name == "arn:aws:eks:ap-southeast-2:864923301006:cluster/stg-eks") | .user.exec.interactiveMode = "IfAvailable"' -i ~/.kube/config
@@ -72,9 +69,8 @@ pipeline {
 
                         '''
 
-                        
                         // Debug: Print the kubeconfig file
-                        sh 'cat ~/.kube/config'
+                        sh 'cat ~/.kube/config'                        
 
                         // Optionally, you can run a kubectl command to verify the connection
                         sh 'kubectl get nodes'
