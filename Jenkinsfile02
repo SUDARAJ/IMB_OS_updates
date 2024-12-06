@@ -24,8 +24,9 @@ pipeline {
                     chmod +x yq_linux_amd64
                     mv yq_linux_amd64 /usr/local/bin/yq
 
-                    # Install eksctl
-                    curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/v0.146.0/eksctl_Linux_amd64.tar.gz" | tar xz -C /usr/local/bin
+                    # Install eksctl (latest version) without using tar
+                    curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_linux_amd64" -o /usr/local/bin/eksctl
+                    chmod +x /usr/local/bin/eksctl
 
                     '''
                 }
