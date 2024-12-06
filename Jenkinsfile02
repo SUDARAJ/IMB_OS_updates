@@ -23,6 +23,10 @@ pipeline {
                     curl -LO "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64"
                     chmod +x yq_linux_amd64
                     mv yq_linux_amd64 /usr/local/bin/yq
+
+                    # Install eksctl
+                    curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/v0.146.0/eksctl_Linux_amd64.tar.gz" | tar xz -C /usr/local/bin
+
                     '''
                 }
             }
@@ -34,6 +38,7 @@ pipeline {
                     sh 'aws --version'
                     sh 'kubectl version --client'
                     sh 'yq --version'
+                    sh 'eksctl version
                 }
             }
         }
@@ -70,10 +75,7 @@ pipeline {
                         // Debug: Print the kubeconfig file
                         sh 'cat ~/.kube/config'
 
-                        // re-Update kubeconfig to connect to the EKS cluster
-                        sh '''
-                        aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks --no-verify-ssl
-                        '''
+
 
                         // Optionally, you can run a kubectl command to verify the connection
                         sh 'kubectl get nodes'
