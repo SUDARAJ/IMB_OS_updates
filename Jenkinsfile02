@@ -68,6 +68,8 @@ pipeline {
                         sh '''
                         # Manually add interactiveMode to the kubeconfig file
                         yq eval '.users[] | select(.name == "arn:aws:eks:ap-southeast-2:864923301006:cluster/stg-eks") | .user.exec.interactiveMode = "IfAvailable"' -i ~/.kube/config
+                        yq eval '.users[] | select(.name == "arn:aws:eks:ap-southeast-2:864923301006:cluster/stg-eks") | .apiVersion = "client.authentication.k8s.io/v1beta1"' -i /root/.kube/config
+
                         '''
 
                         
