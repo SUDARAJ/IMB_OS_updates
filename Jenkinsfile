@@ -87,13 +87,13 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker image with tag: ${DOCKER_IMAGE_TAG}..."
-                //sh "docker build -t ${REPO_NAME}:${DOCKER_IMAGE_TAG} ."
+                sh "docker build -t ${REPO_NAME}:${DOCKER_IMAGE_TAG} ."
             }
         }
         stage('Push Docker Image to ECR') {
             steps {
                 echo "Pushing Docker image to ECR with tag: ${DOCKER_IMAGE_TAG}..."
-                //sh "docker push ${REPO_NAME}:${DOCKER_IMAGE_TAG}"
+                sh "docker push ${REPO_NAME}:${DOCKER_IMAGE_TAG}"
             }
         }
         
