@@ -9,16 +9,18 @@ pipeline {
     stages {
         stage('Check User Information') {
             steps {
-    
-                sh 'pwd'
-                sh 'whoami'  // Explicitly switch to root (this may be redundant if already root)
+                sh '''
+                pwd
+                whoami
+                '''
             }
         }
 
         stage('Install Prerequisites') {
             steps {
-                // Install curl and unzip if not already present
-                sh 'yum install -y curl unzip'
+                sh '''
+                yum install -y curl unzip
+                '''
             }
         }
 
