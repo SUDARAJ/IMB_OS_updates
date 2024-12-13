@@ -6,6 +6,10 @@ pipeline {
         }
     }
 
+    environment {
+        GIT_REPO_URL = "https://github.com/SUDARAJ/IMB_OS_updates.git"
+    }
+
     stages {
         stage('Check User Information') {
             steps {
