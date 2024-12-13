@@ -11,7 +11,7 @@ pipeline {
         REPO_NAME = "864923301006.dkr.ecr.ap-southeast-2.amazonaws.com/support-automations"
         KUBE_NAMESPACE = "support-automations" 
         DEPLOYMENT_NAME = "mail" 
-        DOCKER_IMAGE_TAG = ''  // Initialize the variable for the image tag
+        DOCKER_IMAGE_TAG = "${env.BUILD_NUMBER}"
     }
 
     stages {
@@ -36,24 +36,23 @@ pipeline {
                     yum install -y git
                     git clone -b main $GIT_REPO_URL
                     ls -ltr
+
                     '''
                 }
             }
         }
 
+     
+
         stage('Get the image name & updates the Dockerfile') {
             steps {
                 withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                    script {
-                        // Extract the image tag from the deployment
-                        def image = sh(script: "kubectl get deployment ${DEPLOYMENT_NAME} -n ${KUBE_NAMESPACE} -o=jsonpath='{.spec.template.spec.containers[*].image}'", returnStdout: true).trim()
-                        def imageTag = image.split(":")[1]  // Extract the tag part of the image
-
-                        // Assign the image tag to the environment variable
-                        env.DOCKER_IMAGE_TAG = imageTag
-                    }
-
                     sh '''
+                    cd /root
+                    aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks
+                    kubectl get deployment mail -n support-automations -o=jsonpath='{.spec.template.spec.containers[*].image}'
+                    image=$(kubectl get deployment $DEPLOYMENT_NAME -n $KUBE_NAMESPACE -o=jsonpath='{.spec.template.spec.containers[*].image}')
+
                     cd /root/IMB_OS_updates
                     ls -ltr
                     sed -i "s|^FROM .*|FROM $image|" Dockerfile
@@ -65,19 +64,20 @@ pipeline {
 
         stage('Setup Docker') {
             steps {
-                sh '''
-                cd /root
-                amazon-linux-extras enable docker > /dev/null 2>&1
-                yum install -y docker > /dev/null 2>&1
-                dockerd &
-                docker --version
-                '''
+                        sh '''
+                        cd /root
+                        amazon-linux-extras enable docker > /dev/null 2>&1
+                        yum install -y docker > /dev/null 2>&1
+                        dockerd &
+                        docker --version
+                        '''
+                }
             }
-        }
+        
 
         stage('Build the Docker Image') {
             steps {
-                withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                 withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh '''
                     cd /root
                     aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin ${REPO_NAME}
@@ -87,6 +87,9 @@ pipeline {
                 }
             }
         }
+
+
+
     }
 
     post {
@@ -95,6 +98,3 @@ pipeline {
         }
     }
 }
-
-
-
