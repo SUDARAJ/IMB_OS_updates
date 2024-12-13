@@ -55,7 +55,7 @@ pipeline {
                     aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks
                     kubectl get ns
                     kubectl get deployment mail -n support-automations -o=jsonpath='{.spec.template.spec.containers[*].image}'
-                    image=$(kubectl get deployment mail -n $KUBE_NAMESPACE -o=jsonpath='{.spec.template.spec.containers[*].image}')
+                    image=$(kubectl get deployment $DEPLOYMENT_NAME -n $KUBE_NAMESPACE -o=jsonpath='{.spec.template.spec.containers[*].image}')
 
                     cd /root/IMB_OS_updates
                     ls -ltr
