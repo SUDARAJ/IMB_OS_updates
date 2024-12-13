@@ -59,7 +59,7 @@ pipeline {
             }
         }
 
-        stage('Install Kubectl') {
+        stage('connect to STG') {
             steps {
                 sh '''
                 cd /root
