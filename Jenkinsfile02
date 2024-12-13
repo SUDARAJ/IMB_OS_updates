@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'amazonlinux:2'  // Use Red Hat Universal Base Image 8 as the Docker image
+            image 'registry.access.redhat.com/ubi8/ubi'  // Use Red Hat Universal Base Image 8 as the Docker image
             args '-u root'         // Run as root user
         }
     }
@@ -10,7 +10,7 @@ pipeline {
         stage('Check User Information') {
             steps {
                 sh '''
-                sudo su -
+                cd /root
                 pwd
                 whoami
                 '''
@@ -20,6 +20,7 @@ pipeline {
         stage('Install AWS CLI') {
             steps {
                 sh '''
+                cd /root
                 yum install -y unzip
                 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
                 unzip -o awscliv2.zip  # Automatically overwrite files without prompting 
@@ -29,10 +30,10 @@ pipeline {
             }
         }
 
-
         stage('Install Kubectl') {
             steps {
                 sh '''
+                cd /root
                 KUBECTL_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
                 curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
                 kubectl
@@ -51,4 +52,3 @@ pipeline {
         }
     }
 }
-
