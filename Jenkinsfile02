@@ -2,15 +2,9 @@ pipeline {
     agent {
         docker {
             image 'amazonlinux:2'  
-            args '-u root'         // Run as root user
+            args '-u root'  // Run as root user
         }
     }
-
-    environment {
-            AWS_ACCESS_KEY_ID = credentials('aws-cred')?.accessKey
-            AWS_SECRET_ACCESS_KEY = credentials('aws-cred')?.secretKey
-            AWS_REGION = "ap-southeast-2"
-        }
 
     stages {
         stage('Check User Information') {
@@ -25,43 +19,45 @@ pipeline {
 
         stage('Install AWS CLI') {
             steps {
-                sh '''
-                cd /root
-                yum install -y unzip
-                curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-                unzip -o awscliv2.zip  # Automatically overwrite files without prompting 
-                ./aws/install 
-                aws --version
-                '''
+                withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    sh '''
+                    cd /root
+                    yum install -y unzip
+                    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                    unzip -o awscliv2.zip  # Automatically overwrite files without prompting 
+                    ./aws/install 
+                    aws --version
+                    '''
+                }
             }
         }
-
-        
 
         stage('Install Kubectl') {
             steps {
-                sh '''
-                cd /root
-                KUBECTL_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
-                curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
-                chmod +x ./kubectl
-                mv ./kubectl /usr/local/bin/kubectl
-                kubectl version --client
-                '''
+                withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    sh '''
+                    cd /root
+                    KUBECTL_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
+                    curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+                    chmod +x ./kubectl
+                    mv ./kubectl /usr/local/bin/kubectl
+                    kubectl version --client
+                    '''
+                }
             }
         }
 
-        stage('connect to STG') {
+        stage('Connect to STG') {
             steps {
-                sh '''
-                cd /root
-                aws sts get-caller-identity
-                '''
+                withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    sh '''
+                    cd /root
+                    aws sts get-caller-identity
+                    '''
+                }
             }
         }
-
-
-    } // 
+    }
 
     post {
         always {
@@ -69,3 +65,4 @@ pipeline {
         }
     }
 }
+
