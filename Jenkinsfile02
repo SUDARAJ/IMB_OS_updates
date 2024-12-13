@@ -8,16 +8,31 @@ pipeline {
     stages {
         stage('Switch to Root User') {
             steps {
-                sh 'su -'
-                sh 'pwd'
+                // Switch to root user and verify the user
+                sh 'whoami'  // This will output the current user (you should see "root" here if already root)
+                sh 'su -c "whoami"'  // Explicitly switch to root (this may be redundant if already root)
+            }
+        }
+
+        stage('Install Prerequisites') {
+            steps {
+                // Install curl and unzip if not already present
+                sh 'yum install -y curl unzip'
             }
         }
 
         stage('Install AWS CLI') {
             steps {
+                // Install AWS CLI as root
                 sh 'curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"'
                 sh 'unzip awscliv2.zip'
                 sh './aws/install'
+            }
+        }
+
+        stage('Verify AWS CLI Installation') {
+            steps {
+                sh 'aws --version'  // Check AWS CLI version to verify installation
             }
         }
     }
@@ -28,3 +43,4 @@ pipeline {
         }
     }
 }
+
