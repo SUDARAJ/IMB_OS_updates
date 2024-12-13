@@ -10,18 +10,7 @@ pipeline {
         GIT_REPO_URL = "https://github.com/SUDARAJ/IMB_OS_updates.git"
     }
 
-    stages {
-        stage('Check User Information') {
-            steps {
-                sh '''
-                cd /root
-                pwd
-                whoami
-                '''
-            }
-        }
-
-        stage('Install AWS CLI') {
+        stage('Install AWS CLI & Kubectl') {
             steps {
                 withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh '''
@@ -31,16 +20,7 @@ pipeline {
                     unzip -o awscliv2.zip  # Automatically overwrite files without prompting 
                     ./aws/install 
                     aws --version
-                    '''
-                }
-            }
-        }
 
-        stage('Install Kubectl') {
-            steps {
-                withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                    sh '''
-                    cd /root
                     KUBECTL_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
                     curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
                     chmod +x ./kubectl
@@ -50,6 +30,7 @@ pipeline {
                 }
             }
         }
+
 
         stage('Clone Repository') {
             steps {
