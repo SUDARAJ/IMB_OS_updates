@@ -10,7 +10,7 @@ pipeline {
         stage('Check User Information') {
             steps {
                 sh '''
-                su -
+                sudo su -
                 pwd
                 whoami
                 '''
