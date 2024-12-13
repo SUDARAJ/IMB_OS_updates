@@ -1,77 +1,18 @@
 pipeline {
     agent {
         docker {
-            image 'amazonlinux:2'  // Use Amazon Linux 2 as the Docker image
-            args '-u root'         // Run as root user
+            image 'redhat/ubi8:latest'  // Use Red Hat Universal Base Image 8 as the Docker image
         }
     }
+
     stages {
-        stage('Install AWS CLI, kubectl, and yq') {
+        stage('Example') {
             steps {
-                script {
-                    // Update the package manager and install AWS CLI, kubectl, and yq
-                    sh '''
-                    yum update -y
-                    yum install -y aws-cli tar gzip
-
-                    # Install kubectl 
-                    KUBECTL_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
-                    curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
-                    chmod +x ./kubectl
-                    mv ./kubectl /usr/local/bin/kubectl
-
-                    '''
-                }
-            }
-        }
-        stage('Verify Installations') {
-            steps {
-                script {
-                    // Run commands to verify installations
-                    sh 'aws --version'
-                    sh 'kubectl version --client'
-                    sh 'yq --version'
-                    sh 'eksctl version'
-                }
-            }
-        }
-        stage('Configure AWS Credentials') {
-            steps {
-                script {
-                    // Use the withCredentials block to access AWS credentials
-                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-cred']]) {
-                        // Set AWS environment variables
-                        sh '''
-                        export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-                        export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-                        export AWS_DEFAULT_REGION=ap-southeast-2  # Change to your desired region
-                        '''
-                        
-                        // Update kubeconfig to connect to the EKS cluster
-                        sh '''
-                        aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks
-                        '''
-
-                        sh '''
-                        # Manually add interactiveMode to the kubeconfig file
-                        yq eval '.users[] | select(.name == "arn:aws:eks:ap-southeast-2:864923301006:cluster/stg-eks") | .user.exec.interactiveMode = "IfAvailable"' -i /root/.kube/config
-                        yq eval '.users[] | select(.name == "arn:aws:eks:ap-southeast-2:864923301006:cluster/stg-eks") | .apiVersion = "client.authentication.k8s.io/v1beta1"' -i /root/.kube/config
-
-                        '''
-
-                        sh 'export KUBECONFIG=/root/.kube/config'
-                        sh 'ls -l /root/.kube/config'
-
-                        // Debug: Print the kubeconfig file
-                        sh 'cat /root/.kube/config'                        
-
-                        // Optionally, you can run a kubectl command to verify the connection
-                         sh 'kubectl get nodes'
-                    }
-                }
+                echo 'Running on Red Hat UBI 8 Docker image.'
             }
         }
     }
+    
     post {
         always {
             echo 'Pipeline completed.'
