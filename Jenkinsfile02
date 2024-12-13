@@ -80,9 +80,10 @@ pipeline {
         stage('Update the docker file') {
             steps {
                     sh '''
+                        cd /root
+                        image=$(kubectl get deployment mail -n support-automations -o=jsonpath='{.spec.template.spec.containers[*].image}')
                         cd /root/IMB_OS_updates
                         ls -ltr
-                        
                         sed -i "s|^FROM .*|FROM $image|" Dockerfile
                         cat Dockerfile
                         
