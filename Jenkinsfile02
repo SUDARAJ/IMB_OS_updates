@@ -19,6 +19,7 @@ pipeline {
                     curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
                     chmod +x ./kubectl
                     mv ./kubectl /usr/local/bin/kubectl
+                    
 
                     # Install yq
                     curl -LO "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64"
