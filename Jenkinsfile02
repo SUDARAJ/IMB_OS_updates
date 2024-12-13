@@ -16,28 +16,18 @@ pipeline {
             }
         }
 
-        stage('Install Prerequisites') {
+        stage('Install AWS CLI') {
             steps {
                 sh '''
-                yum install -y curl unzip
+                yum install -y unzip
+                curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                unzip awscliv2.zip
+                ./aws/install
+                aws --version
                 '''
             }
         }
-
-        stage('Install AWS CLI') {
-            steps {
-                // Install AWS CLI as root
-                sh 'curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"'
-                sh 'unzip awscliv2.zip'
-                sh './aws/install'
-            }
-        }
-
-        stage('Verify AWS CLI Installation') {
-            steps {
-                sh 'aws --version'  // Check AWS CLI version to verify installation
-            }
-        }
+        
     }
 
     post {
