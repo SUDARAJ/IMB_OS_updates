@@ -19,18 +19,6 @@ pipeline {
                     curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
                     chmod +x ./kubectl
                     mv ./kubectl /usr/local/bin/kubectl
-                    
-
-                    # Install yq
-                    curl -LO "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64"
-                    chmod +x yq_linux_amd64
-                    mv yq_linux_amd64 /usr/local/bin/yq
-
-                    # Install eksctl (latest version)
-                    curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_linux_amd64.tar.gz"
-                    tar -xzf eksctl_linux_amd64.tar.gz eksctl
-                    mv eksctl /usr/local/bin/
-                    rm eksctl_linux_amd64.tar.gz # Cleanup the tar file
 
                     '''
                 }
