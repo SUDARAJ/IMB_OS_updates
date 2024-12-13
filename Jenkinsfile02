@@ -47,7 +47,7 @@ pipeline {
             }
         }
 
-        stage('Configure EKS and Update Dockerfile') {
+        stage('configures EKS, retrieves the image name, and updates the Dockerfile') {
             steps {
                 withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh '''
@@ -69,25 +69,27 @@ pipeline {
 
         stage('Login to ECR') {
             steps {
-                 withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         sh '''
                         cd /root
                         amazon-linux-extras enable docker > /dev/null 2>&1
                         yum install -y docker > /dev/null 2>&1
                         dockerd &
                         docker --version
-                        aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin ${REPO_NAME}    
                         '''
                 }
             }
-        }
+        
 
         stage('Build Docker Image') {
             steps {
-                sh '''
-                cd /root/IMB_OS_updates
-                docker build -t ${REPO_NAME}:${DOCKER_IMAGE_TAG} .
-                '''
+                 withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    sh '''
+                    cd /root
+                    aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin ${REPO_NAME}
+                    cd /root/IMB_OS_updates
+                    docker build -t ${REPO_NAME}:${DOCKER_IMAGE_TAG} .
+                    '''
+                }
             }
         }
 
