@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'redhat/ubi8:latest'  // Use Red Hat Universal Base Image 8 as the Docker image
+            image 'amazonlinux:2'  // Use Red Hat Universal Base Image 8 as the Docker image
             args '-u root'         // Run as root user
         }
     }
