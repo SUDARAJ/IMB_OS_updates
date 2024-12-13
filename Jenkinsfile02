@@ -9,7 +9,7 @@ pipeline {
         stage('Switch to Root User') {
             steps {
                 // Switch to root user and verify the user
-                sh 'whoami'  // This will output the current user (you should see "root" here if already root)
+                
                 sh 'su -c "whoami"'  // Explicitly switch to root (this may be redundant if already root)
             }
         }
