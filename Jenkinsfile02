@@ -15,7 +15,7 @@ pipeline {
     }
 
     stages {
-        stage('Setup AWS CLI and Kubectl') {
+        stage('Setup AWS CLI, Kubectl & Clone the repo') {
             steps {
                 withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh '''
@@ -31,30 +31,25 @@ pipeline {
                     chmod +x ./kubectl
                     mv ./kubectl /usr/local/bin/kubectl
                     kubectl version --client
+
+                    cd /root
+                    yum install -y git
+                    git clone -b main $GIT_REPO_URL
+                    ls -ltr
+
                     '''
                 }
             }
         }
 
-        stage('Clone Git Repository') {
-            steps {
-                sh '''
-                cd /root
-                yum install -y git
-                git clone -b main $GIT_REPO_URL
-                ls -ltr
-                '''
-            }
-        }
+     
 
-        stage('configures EKS, retrieves the image name, and updates the Dockerfile') {
+        stage('Get the image name & updates the Dockerfile') {
             steps {
                 withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh '''
                     cd /root
-                    aws sts get-caller-identity
                     aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks
-                    kubectl get ns
                     kubectl get deployment mail -n support-automations -o=jsonpath='{.spec.template.spec.containers[*].image}'
                     image=$(kubectl get deployment $DEPLOYMENT_NAME -n $KUBE_NAMESPACE -o=jsonpath='{.spec.template.spec.containers[*].image}')
 
@@ -67,7 +62,7 @@ pipeline {
             }
         }
 
-        stage('Login to ECR') {
+        stage('Setup Docker') {
             steps {
                         sh '''
                         cd /root
@@ -80,7 +75,7 @@ pipeline {
             }
         
 
-        stage('Build Docker Image') {
+        stage('Build the Docker Image') {
             steps {
                  withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh '''
