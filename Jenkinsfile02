@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'amazonlinux:2'  
-            args '-u root' // Run as root user
+            args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
 
