@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Switch to Root User') {
             steps {
-                sh 'sudo su -'
+                sh 'su -'
                 sh 'pwd'
             }
         }
