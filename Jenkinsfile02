@@ -67,8 +67,7 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                script {
-                    echo 'Cloning GitHub repository...'
+                
                     sh '''
                         cd /root
                         yum install -y git
@@ -77,7 +76,6 @@ pipeline {
                     '''
                 }
             }
-        }
 
     }//
 
