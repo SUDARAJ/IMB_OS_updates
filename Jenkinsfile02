@@ -6,13 +6,22 @@ pipeline {
     }
 
     stages {
-        stage('Example') {
+        stage('Switch to Root User') {
             steps {
-                echo 'Running on Red Hat UBI 8 Docker image.'
+                sh 'sudo su -'
+                sh 'pwd'
+            }
+        }
+
+        stage('Install AWS CLI') {
+            steps {
+                sh 'curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"'
+                sh 'unzip awscliv2.zip'
+                sh './aws/install'
             }
         }
     }
-    
+
     post {
         always {
             echo 'Pipeline completed.'
