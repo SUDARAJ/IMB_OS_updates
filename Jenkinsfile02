@@ -8,6 +8,7 @@ pipeline {
 
     environment {
         GIT_REPO_URL = "https://github.com/SUDARAJ/IMB_OS_updates.git"
+        REPO_NAME = "864923301006.dkr.ecr.ap-southeast-2.amazonaws.com/support-automations"
     }
 
     stages {
