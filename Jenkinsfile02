@@ -53,6 +53,7 @@ pipeline {
                     sh '''
                     cd /root
                     aws sts get-caller-identity
+                    aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks
                     '''
                 }
             }
