@@ -30,6 +30,21 @@ pipeline {
             }
         }
 
+        stage('Configure AWS Credentials') {
+            steps {
+                script {
+                    // Use the withCredentials block to access AWS credentials
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-cred']]) {
+                        // Set AWS environment variables
+                        sh '''
+                        export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                        export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+                        export AWS_DEFAULT_REGION=ap-southeast-2  # Change to your desired region
+                        '''
+                    }
+                }
+            }
+
         stage('Install Kubectl') {
             steps {
                 sh '''
