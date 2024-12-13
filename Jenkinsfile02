@@ -63,7 +63,7 @@ pipeline {
             steps {
                 sh '''
                 cd /root
-                aws eks --region ap-southeast-2 update-kubeconfig --name stg-eks
+                aws sts get-caller-identity
                 '''
             }
         }
