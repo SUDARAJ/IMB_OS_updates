@@ -67,7 +67,6 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                
                     sh '''
                         cd /root
                         yum install -y git
