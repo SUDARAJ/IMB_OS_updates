@@ -71,7 +71,7 @@ pipeline {
                     echo 'Cloning GitHub repository...'
                     sh '''
                         cd /root
-                        git clone -b main ${env.GIT_REPO_URL}
+                        git clone -b main $GIT_REPO_URL
                         ls -ltr
                     '''
                 }
