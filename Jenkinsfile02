@@ -73,11 +73,18 @@ pipeline {
                         cd /root
                         amazon-linux-extras enable docker
                         yum install -y docker
-                        aws sts get-caller-identity
+                        
                         aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin ${REPO_NAME}
                         aws ecr describe-repositories --repository-names support-automations
                         '''
                 }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo "Building Docker image with tag: ${DOCKER_IMAGE_TAG}..."
+                sh "docker build -t ${REPO_NAME}:${DOCKER_IMAGE_TAG} ."
             }
         }
 
