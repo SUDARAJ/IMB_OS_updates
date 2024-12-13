@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'amazonlinux:2'  
-            args '-u root'  // Run as root user
+            args '-u root' // Run as root user
         }
     }
 
@@ -10,6 +10,7 @@ pipeline {
         GIT_REPO_URL = "https://github.com/SUDARAJ/IMB_OS_updates.git"
     }
 
+    stages {
         stage('Install AWS CLI & Kubectl') {
             steps {
                 withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
@@ -31,17 +32,16 @@ pipeline {
             }
         }
 
-
         stage('Clone Repository') {
             steps {
-                    sh '''
-                        cd /root
-                        yum install -y git
-                        git clone -b main $GIT_REPO_URL
-                        ls -ltr
-                    '''
-                }
+                sh '''
+                cd /root
+                yum install -y git
+                git clone -b main $GIT_REPO_URL
+                ls -ltr
+                '''
             }
+        }
 
         stage('Connect to STG') {
             steps {
@@ -62,10 +62,7 @@ pipeline {
                 }
             }
         }
-
-
-
-    }//
+    }
 
     post {
         always {
@@ -73,4 +70,5 @@ pipeline {
         }
     }
 }
+
 
