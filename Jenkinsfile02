@@ -6,6 +6,12 @@ pipeline {
         }
     }
 
+    environment {
+            AWS_ACCESS_KEY_ID = credentials('aws-cred')?.accessKey
+            AWS_SECRET_ACCESS_KEY = credentials('aws-cred')?.secretKey
+            AWS_REGION = "ap-southeast-2"
+        }
+
     stages {
         stage('Check User Information') {
             steps {
