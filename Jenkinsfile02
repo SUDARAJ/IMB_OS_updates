@@ -14,8 +14,9 @@ pipeline {
                     yum update -y
                     yum install -y aws-cli tar gzip
 
-                    # Install kubectl version 1.24
-                    curl -LO "https://dl.k8s.io/release/v1.31.0/bin/linux/amd64/kubectl"
+                    # Install kubectl 
+                    KUBECTL_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
+                    curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
                     chmod +x ./kubectl
                     mv ./kubectl /usr/local/bin/kubectl
 
