@@ -74,7 +74,7 @@ pipeline {
                         cd /root
                         amazon-linux-extras enable docker
                         yum install -y docker
-                        
+                        dockerd &
                         aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin ${REPO_NAME}
                         aws ecr describe-repositories --repository-names support-automations
                         '''
