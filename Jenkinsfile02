@@ -12,7 +12,7 @@ pipeline {
         KUBE_NAMESPACE = "support-automations" 
         DEPLOYMENT_NAME = "mail" 
         DOCKER_IMAGE_TAG = "${env.BUILD_NUMBER}"
-        IMAGE_TAG = ''
+        
     }
 
     stages {
