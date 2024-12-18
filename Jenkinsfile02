@@ -12,6 +12,7 @@ pipeline {
         KUBE_NAMESPACE = "support-automations" 
         DEPLOYMENT_NAME = "mail" 
         DOCKER_IMAGE_TAG = "${env.BUILD_NUMBER}"
+        IMAGE_TAG = ''
         
     }
 
@@ -55,7 +56,8 @@ pipeline {
                     image=$(kubectl get deployment $DEPLOYMENT_NAME -n $KUBE_NAMESPACE -o=jsonpath='{.spec.template.spec.containers[*].image}')
                     image_tag=$(echo $image | cut -d':' -f2)
                     IMAGE_TAG="${image_tag}_vulnfix_${BUILD_NUMBER}"
-                    export IMAGE_TAG
+                    
+                    echo "IMAGE_TAG=${IMAGE_TAG}" > image_tag.txt
                     cd /root/IMB_OS_updates
                     ls -ltr
                     sed -i "s|^FROM .*|FROM $image|" Dockerfile
@@ -80,11 +82,17 @@ pipeline {
 
         stage('Build the Docker Image') {
             steps {
+                script {
+                    // Read the IMAGE_TAG value from the file created in the previous stage
+                    def imageTag = readFile('image_tag.txt').trim()
+                    env.IMAGE_TAG = imageTag // Assign to the global environment variable
+                }
                  withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh '''
                     cd /root
                     aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin ${REPO_NAME}
                     cd /root/IMB_OS_updates
+
                     docker build -t ${REPO_NAME}:${IMAGE_TAG} .
                     '''
                 }
