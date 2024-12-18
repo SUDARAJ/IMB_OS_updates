@@ -81,7 +81,7 @@ pipeline {
             }
         
 
-        stage('Build the Docker Image') {
+        stage('Build & Push the Docker Image to ECR') {
             steps {
                  withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh '''
@@ -90,6 +90,7 @@ pipeline {
                     aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin ${REPO_NAME}
                     cd /root/IMB_OS_updates
                     docker build -t ${REPO_NAME}:${IMAGE_TAG} .
+                    docker push ${REPO_NAME}:${IMAGE_TAG}
                     '''
                 }
             }
