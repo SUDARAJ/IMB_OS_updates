@@ -54,7 +54,8 @@ pipeline {
                     kubectl get deployment mail -n support-automations -o=jsonpath='{.spec.template.spec.containers[*].image}'
                     image=$(kubectl get deployment $DEPLOYMENT_NAME -n $KUBE_NAMESPACE -o=jsonpath='{.spec.template.spec.containers[*].image}')
                     image_tag=$(echo $image | cut -d':' -f2)
-                    export IMAGE_TAG=$image_tag
+                    IMAGE_TAG="${image_tag}_vulnfix"
+                    export IMAGE_TAG
                     cd /root/IMB_OS_updates
                     ls -ltr
                     sed -i "s|^FROM .*|FROM $image|" Dockerfile
