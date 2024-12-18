@@ -57,8 +57,8 @@ pipeline {
                     image_tag=$(echo $image | cut -d':' -f2)
                     IMAGE_TAG="${image_tag}_vulnfix_${BUILD_NUMBER}"
                     
-                    echo "IMAGE_TAG=${IMAGE_TAG}" > image_tag.txt
-                    ls -ltr
+                    echo "${IMAGE_TAG}" > image_tag.txt
+                    cat image_tag.txt
                     cd /root/IMB_OS_updates
                     ls -ltr
                     sed -i "s|^FROM .*|FROM $image|" Dockerfile
