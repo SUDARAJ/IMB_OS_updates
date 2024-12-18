@@ -85,7 +85,7 @@ pipeline {
                  withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh '''
                     cd /root
-                    IMAGE_TAG=$(cat /tmp/image_tag.txt)
+                    IMAGE_TAG=$(cat /image_tag.txt)
                     aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin ${REPO_NAME}
                     cd /root/IMB_OS_updates
                     docker build -t ${REPO_NAME}:${IMAGE_TAG} .
